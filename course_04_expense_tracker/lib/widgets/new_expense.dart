@@ -1,5 +1,4 @@
 import 'package:course_04_expense_tracker/main.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/expense.dart';
