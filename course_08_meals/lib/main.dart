@@ -1,4 +1,4 @@
-import 'package:course_08_meals/screens/categories_screen.dart';
+import 'package:course_08_meals/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -23,7 +23,8 @@ class App extends StatelessWidget {
     return MaterialApp(
       theme: theme,
       // home: MealsScreen(title: 'xx', meals: dummyMeals),
-      home: const CategoriesScreen(),
+      // home: const CategoriesScreen(),
+      home: const TabsScreen(),
     );
   }
 }
