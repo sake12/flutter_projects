@@ -12,8 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Groceries',
-      theme: ThemeData.dark().copyWith(
-        useMaterial3: true,
+      theme: ThemeData.dark(useMaterial3: true).copyWith(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 147, 229, 250),
           brightness: Brightness.dark,
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color.fromARGB(255, 50, 58, 60),
       ),
-      home: ...,
+      home: ListView(),
     );
   }
 }
