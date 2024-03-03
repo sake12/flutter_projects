@@ -27,32 +27,51 @@ class _GroceryListState extends State<GroceryList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Your Groceries"),
-        actions: [
-          IconButton(
-            onPressed: _addNewItem,
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
-      body: ListView.builder(
+    Widget content = const Center(
+      child: Text('No data'),
+    );
+
+    if (_groceryItems.isNotEmpty) {
+      content = ListView.builder(
         itemCount: _groceryItems.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_groceryItems[index].name),
-            leading: Container(
-              width: 24,
-              height: 24,
-              color: _groceryItems[index].category.color,
-            ),
-            trailing: Text(
-              _groceryItems[index].quantity.toString(),
+          return Dismissible(
+            key: Key(_groceryItems[index].id),
+            onDismissed: (direction) {
+              var name = _groceryItems[index].name;
+              setState(() {
+                _groceryItems.remove(_groceryItems[index]);
+              });
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Removed: $name '),
+              ));
+            },
+            child: ListTile(
+              title: Text(_groceryItems[index].name),
+              leading: Container(
+                width: 24,
+                height: 24,
+                color: _groceryItems[index].category.color,
+              ),
+              trailing: Text(
+                _groceryItems[index].quantity.toString(),
+              ),
             ),
           );
         },
-      ),
-    );
+      );
+    }
+
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Your Groceries"),
+          actions: [
+            IconButton(
+              onPressed: _addNewItem,
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
+        body: content);
   }
 }
