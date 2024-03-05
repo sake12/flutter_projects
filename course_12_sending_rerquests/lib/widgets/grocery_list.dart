@@ -15,6 +15,7 @@ class GroceryList extends StatefulWidget {
 
 class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
+  var _isLoading = true;
 
   @override
   void initState() {
@@ -32,11 +33,11 @@ class _GroceryListState extends State<GroceryList> {
     );
 
     final Map<String, dynamic> listData = json.decode(response.body);
-    final List<GroceryItem> _loadedItems = [];
+    final List<GroceryItem> loadedItems = [];
     for (var element in listData.entries) {
       final category = categories.entries
           .firstWhere((x) => x.value.title == element.value['category']);
-      _loadedItems.add(
+      loadedItems.add(
         GroceryItem(
           id: element.key,
           name: element.value['name'],
@@ -47,18 +48,25 @@ class _GroceryListState extends State<GroceryList> {
     }
 
     setState(() {
-      _groceryItems = _loadedItems;
+      _groceryItems = loadedItems;
+      _isLoading = false;
     });
   }
 
   void _addNewItem() async {
-    await Navigator.of(context).push<GroceryItem>(
+    final item = await Navigator.of(context).push<GroceryItem>(
       MaterialPageRoute(
         builder: (ctx) => const NewItem(),
       ),
     );
 
-    _refreshData();
+    if (item == null) {
+      return;
+    }
+
+    setState(() {
+      _groceryItems.add(item);
+    });
   }
 
   @override
@@ -66,6 +74,10 @@ class _GroceryListState extends State<GroceryList> {
     Widget content = const Center(
       child: Text('No data'),
     );
+
+    if (_isLoading == true) {
+      content = const Center(child: CircularProgressIndicator());
+    }
 
     if (_groceryItems.isNotEmpty) {
       content = ListView.builder(
