@@ -15,62 +15,47 @@ class GroceryList extends StatefulWidget {
 
 class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
-  var _isLoading = true;
-  String? _error;
+  late Future<List<GroceryItem>> _loadedItems;
 
   @override
   void initState() {
     super.initState();
-    _refreshData();
+    _loadedItems = _refreshData();
   }
 
-  void _refreshData() async {
+  Future<List<GroceryItem>> _refreshData() async {
     final url = Uri.https(
         'flutterudemytest-default-rtdb.europe-west1.firebasedatabase.app',
         'shopping-list.json');
 
-    try {
-      final response = await http.get(
-        url,
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode >= 400) {
-        setState(() {
-          _error = 'Failed to fetch. error: ${response.statusCode}';
-        });
-      }
-
-      if (response.body == "null") {
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final Map<String, dynamic> listData = json.decode(response.body);
-      final List<GroceryItem> loadedItems = [];
-      for (var element in listData.entries) {
-        final category = categories.entries
-            .firstWhere((x) => x.value.title == element.value['category']);
-        loadedItems.add(
-          GroceryItem(
-            id: element.key,
-            name: element.value['name'],
-            quantity: element.value['quantity'],
-            category: category.value,
-          ),
-        );
-      }
-
-      setState(() {
-        _groceryItems = loadedItems;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to fetch!';
-      });
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
+    if (response.statusCode >= 400) {
+      throw Exception('Failed to fetch. error: ${response.statusCode}');
     }
+
+    if (response.body == "null") {
+      return [];
+    }
+
+    final Map<String, dynamic> listData = json.decode(response.body);
+    final List<GroceryItem> loadedItems = [];
+    for (var element in listData.entries) {
+      final category = categories.entries
+          .firstWhere((x) => x.value.title == element.value['category']);
+      loadedItems.add(
+        GroceryItem(
+          id: element.key,
+          name: element.value['name'],
+          quantity: element.value['quantity'],
+          category: category.value,
+        ),
+      );
+    }
+
+    return loadedItems;
   }
 
   void _addNewItem() async {
@@ -99,9 +84,7 @@ class _GroceryListState extends State<GroceryList> {
     final response = await http.delete(url);
 
     if (response.statusCode >= 400) {
-      setState(() {
-        _error = 'Failed to fetch. error: ${response.statusCode}';
-      });
+      throw Exception('Failed to fetch. error: ${response.statusCode}');
     }
 
     setState(() {
@@ -115,55 +98,59 @@ class _GroceryListState extends State<GroceryList> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = const Center(
-      child: Text('No data'),
-    );
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Your Groceries"),
+        actions: [
+          IconButton(
+            onPressed: _addNewItem,
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+      body: FutureBuilder(
+        future: _loadedItems,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-    if (_isLoading == true) {
-      content = const Center(child: CircularProgressIndicator());
-    }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(snapshot.error.toString()),
+            );
+          }
 
-    if (_groceryItems.isNotEmpty) {
-      content = ListView.builder(
-        itemCount: _groceryItems.length,
-        itemBuilder: (context, index) {
-          return Dismissible(
-            key: Key(_groceryItems[index].id),
-            onDismissed: (direction) {
-              _removeItem(_groceryItems[index]);
+          if (snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text('No data'),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              return Dismissible(
+                key: Key(snapshot.data![index].id),
+                onDismissed: (direction) {
+                  _removeItem(_groceryItems[index]);
+                },
+                child: ListTile(
+                  title: Text(snapshot.data![index].name),
+                  leading: Container(
+                    width: 24,
+                    height: 24,
+                    color: snapshot.data![index].category.color,
+                  ),
+                  trailing: Text(
+                    snapshot.data![index].quantity.toString(),
+                  ),
+                ),
+              );
             },
-            child: ListTile(
-              title: Text(_groceryItems[index].name),
-              leading: Container(
-                width: 24,
-                height: 24,
-                color: _groceryItems[index].category.color,
-              ),
-              trailing: Text(
-                _groceryItems[index].quantity.toString(),
-              ),
-            ),
           );
         },
-      );
-    }
-
-    if (_error != null) {
-      content = Center(
-        child: Text(_error!),
-      );
-    }
-
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Your Groceries"),
-          actions: [
-            IconButton(
-              onPressed: _addNewItem,
-              icon: const Icon(Icons.add),
-            ),
-          ],
-        ),
-        body: content);
+      ),
+    );
   }
 }
