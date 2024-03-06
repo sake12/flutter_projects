@@ -16,6 +16,7 @@ class GroceryList extends StatefulWidget {
 class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
   var _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -27,30 +28,49 @@ class _GroceryListState extends State<GroceryList> {
     final url = Uri.https(
         'flutterudemytest-default-rtdb.europe-west1.firebasedatabase.app',
         'shopping-list.json');
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
 
-    final Map<String, dynamic> listData = json.decode(response.body);
-    final List<GroceryItem> loadedItems = [];
-    for (var element in listData.entries) {
-      final category = categories.entries
-          .firstWhere((x) => x.value.title == element.value['category']);
-      loadedItems.add(
-        GroceryItem(
-          id: element.key,
-          name: element.value['name'],
-          quantity: element.value['quantity'],
-          category: category.value,
-        ),
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json'},
       );
-    }
+      if (response.statusCode >= 400) {
+        setState(() {
+          _error = 'Failed to fetch. error: ${response.statusCode}';
+        });
+      }
 
-    setState(() {
-      _groceryItems = loadedItems;
-      _isLoading = false;
-    });
+      if (response.body == "null") {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final Map<String, dynamic> listData = json.decode(response.body);
+      final List<GroceryItem> loadedItems = [];
+      for (var element in listData.entries) {
+        final category = categories.entries
+            .firstWhere((x) => x.value.title == element.value['category']);
+        loadedItems.add(
+          GroceryItem(
+            id: element.key,
+            name: element.value['name'],
+            quantity: element.value['quantity'],
+            category: category.value,
+          ),
+        );
+      }
+
+      setState(() {
+        _groceryItems = loadedItems;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to fetch!';
+      });
+    }
   }
 
   void _addNewItem() async {
@@ -67,6 +87,30 @@ class _GroceryListState extends State<GroceryList> {
     setState(() {
       _groceryItems.add(item);
     });
+  }
+
+  void _removeItem(GroceryItem groceryItem) async {
+    var name = groceryItem.name;
+
+    final url = Uri.https(
+        'flutterudemytest-default-rtdb.europe-west1.firebasedatabase.app',
+        'shopping-list/${groceryItem.id}.json');
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _error = 'Failed to fetch. error: ${response.statusCode}';
+      });
+    }
+
+    setState(() {
+      _groceryItems.remove(groceryItem);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Removed: $name '),
+    ));
   }
 
   @override
@@ -86,13 +130,7 @@ class _GroceryListState extends State<GroceryList> {
           return Dismissible(
             key: Key(_groceryItems[index].id),
             onDismissed: (direction) {
-              var name = _groceryItems[index].name;
-              setState(() {
-                _groceryItems.remove(_groceryItems[index]);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Removed: $name '),
-              ));
+              _removeItem(_groceryItems[index]);
             },
             child: ListTile(
               title: Text(_groceryItems[index].name),
@@ -107,6 +145,12 @@ class _GroceryListState extends State<GroceryList> {
             ),
           );
         },
+      );
+    }
+
+    if (_error != null) {
+      content = Center(
+        child: Text(_error!),
       );
     }
 
