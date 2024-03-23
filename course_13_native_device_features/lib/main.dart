@@ -1,6 +1,6 @@
+import 'package:course_13_native_device_features/widgets/places_list.dart';
 import 'package:flutter/material.dart';
-
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final colorScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
@@ -8,37 +8,28 @@ final colorScheme = ColorScheme.fromSeed(
   background: const Color.fromARGB(255, 56, 49, 66),
 );
 
-final theme = ThemeData(useMaterial3: true).copyWith(
+final theme = ThemeData.dark(useMaterial3: true).copyWith(
   scaffoldBackgroundColor: colorScheme.background,
   colorScheme: colorScheme,
-  textTheme: GoogleFonts.ubuntuCondensedTextTheme().copyWith(
-    titleSmall: GoogleFonts.ubuntuCondensed(
-      fontWeight: FontWeight.bold,
-    ),
-    titleMedium: GoogleFonts.ubuntuCondensed(
-      fontWeight: FontWeight.bold,
-    ),
-    titleLarge: GoogleFonts.ubuntuCondensed(
-      fontWeight: FontWeight.bold,
-    ),
-  ),
 );
 
 void main() {
   runApp(
-      const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
+    ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Great Places',
       theme: theme,
-      home: ...,
+      home: const PlacesList(),
     );
   }
 }
