@@ -1,8 +1,8 @@
 import 'package:course_13_native_device_features/models/place.dart';
 import 'package:flutter/material.dart';
 
-class PlaceDetail extends StatelessWidget {
-  const PlaceDetail(this.place, {Key? key}) : super(key: key);
+class PlaceDetailScreen extends StatelessWidget {
+  const PlaceDetailScreen(this.place, {Key? key}) : super(key: key);
   final Place place;
 
   @override

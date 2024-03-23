@@ -1,4 +1,4 @@
-import 'package:course_13_native_device_features/widgets/places_list.dart';
+import 'package:course_13_native_device_features/screens/places.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Great Places',
       theme: theme,
-      home: const PlacesList(),
+      home: const PlacesScreen(),
     );
   }
 }
