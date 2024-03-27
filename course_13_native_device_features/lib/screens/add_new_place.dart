@@ -11,10 +11,16 @@ class AddNewPlaceScreen extends ConsumerStatefulWidget {
 }
 
 class _AddNewPlaceState extends ConsumerState<AddNewPlaceScreen> {
-  final _enteredName = TextEditingController();
+  final _enteredTitle = TextEditingController();
 
   _addPlace() {
-    final place = Place(title: _enteredName.text);
+    final title = _enteredTitle.text;
+
+    if (title.isEmpty) {
+      return;
+    }
+
+    final place = Place(title: title);
     ref.read(placesProvider.notifier).addNewPlace(place);
 
     Navigator.of(context).pop();
@@ -22,8 +28,8 @@ class _AddNewPlaceState extends ConsumerState<AddNewPlaceScreen> {
 
   @override
   void dispose() {
+    _enteredTitle.dispose();
     super.dispose();
-    _enteredName.dispose();
   }
 
   @override
@@ -38,7 +44,7 @@ class _AddNewPlaceState extends ConsumerState<AddNewPlaceScreen> {
           children: [
             TextField(
               decoration: const InputDecoration(labelText: 'Title'),
-              controller: _enteredName,
+              controller: _enteredTitle,
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(

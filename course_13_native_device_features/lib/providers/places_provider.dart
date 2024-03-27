@@ -2,7 +2,7 @@ import 'package:course_13_native_device_features/models/place.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PlacesProviderNotifier extends StateNotifier<List<Place>> {
-  PlacesProviderNotifier() : super([]);
+  PlacesProviderNotifier() : super(const []);
 
   addNewPlace(Place place) {
     state = [...state, place];

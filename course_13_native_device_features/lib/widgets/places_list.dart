@@ -1,18 +1,13 @@
 import 'package:course_13_native_device_features/models/place.dart';
-import 'package:course_13_native_device_features/providers/places_provider.dart';
 import 'package:course_13_native_device_features/screens/place_detail.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PlacesList extends ConsumerStatefulWidget {
-  const PlacesList({super.key});
+class PlacesList extends StatelessWidget {
+  final List<Place> places;
 
-  @override
-  ConsumerState<PlacesList> createState() => _PlacesListState();
-}
+  const PlacesList({required this.places, super.key});
 
-class _PlacesListState extends ConsumerState<PlacesList> {
-  void _goToDetails(Place place) async {
+  void _goToDetails(Place place, BuildContext context) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => PlaceDetailScreen(place),
@@ -22,8 +17,6 @@ class _PlacesListState extends ConsumerState<PlacesList> {
 
   @override
   Widget build(BuildContext context) {
-    final places = ref.watch(placesProvider);
-
     if (places.isEmpty) {
       return const Center(
         child: Text(
@@ -40,7 +33,7 @@ class _PlacesListState extends ConsumerState<PlacesList> {
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(places[index].title),
-          onTap: () => _goToDetails(places[index]),
+          onTap: () => _goToDetails(places[index], context),
         );
       },
     );

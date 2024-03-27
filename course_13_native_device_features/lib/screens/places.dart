@@ -1,12 +1,16 @@
+import 'package:course_13_native_device_features/providers/places_provider.dart';
 import 'package:course_13_native_device_features/screens/add_new_place.dart';
 import 'package:course_13_native_device_features/widgets/places_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PlacesScreen extends StatelessWidget {
+class PlacesScreen extends ConsumerWidget {
   const PlacesScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context, WidgetRef ref) {
+    final places = ref.watch(placesProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Places"),
@@ -23,7 +27,7 @@ class PlacesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const PlacesList(),
+      body: PlacesList(places: places),
     );
   }
 }
