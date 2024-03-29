@@ -30,12 +30,14 @@ class PlacesList extends StatelessWidget {
 
     return ListView.builder(
       itemCount: places.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(places[index].title),
-          onTap: () => _goToDetails(places[index], context),
-        );
-      },
+      itemBuilder: (context, index) => ListTile(
+        leading: CircleAvatar(
+          radius: 26,
+          backgroundImage: FileImage(places[index].image),
+        ),
+        title: Text(places[index].title),
+        onTap: () => _goToDetails(places[index], context),
+      ),
     );
   }
 }
