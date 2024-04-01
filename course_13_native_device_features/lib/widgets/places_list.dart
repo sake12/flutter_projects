@@ -36,6 +36,7 @@ class PlacesList extends StatelessWidget {
           backgroundImage: FileImage(places[index].image),
         ),
         title: Text(places[index].title),
+        subtitle: Text(places[index].location.address),
         onTap: () => _goToDetails(places[index], context),
       ),
     );

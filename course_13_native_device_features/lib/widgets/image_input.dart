@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageInput extends StatefulWidget {
-  const ImageInput({Key? key, required this.onPickImage}) : super(key: key);
+  const ImageInput({super.key, required this.onPickImage});
 
   final void Function(File image) onPickImage;
 

@@ -1,4 +1,4 @@
-package com.example.course_13_native_device_features
+package com.example.test
 
 import io.flutter.embedding.android.FlutterActivity
 

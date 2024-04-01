@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PlacesScreen extends ConsumerWidget {
-  const PlacesScreen({Key? key}) : super(key: key);
+  const PlacesScreen({super.key});
 
   @override
   build(BuildContext context, WidgetRef ref) {
